@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zentrav - Yasak Kaldırma Talepleri</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #0d0f14; color: #e5e7eb; font-family: system-ui, sans-serif; margin: 0; }
+    .card { background: #151820; border: 1px solid #2a2f3a; border-radius: 12px; }
+    .btn-green { background: #53fc18; color: #0d0f14; font-weight: 600; border: none; border-radius: 8px; padding: 0.55rem 1.3rem; cursor: pointer; }
+    .btn-gray { background: #2a2f3a; color: #e5e7eb; border: none; border-radius: 8px; padding: 0.55rem 1.3rem; cursor: pointer; }
+    .btn-primary { background: #3b82f6; color: white; border: none; border-radius: 8px; padding: 0.55rem 1.2rem; cursor: pointer; }
+    .hidden { display: none !important; }
+    input { background: #0f1218; border: 1px solid #2a2f3a; border-radius: 8px; color: white; padding: 0.5rem 0.75rem; outline: none; width: 100%; }
+    .request-item { cursor: pointer; transition: 0.15s; }
+    .request-item:hover, .request-item.active { background: #1e2430; }
+  </style>
+</head>
+<body>
+  <!-- LOGIN -->
+  <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="card p-8 max-w-md w-full text-center">
+      <div class="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-blue-500 mx-auto mb-4 flex items-center justify-center text-2xl font-bold text-black">Z</div>
+      <h1 class="text-xl font-bold mb-1">Zentrav Panel</h1>
+      <p class="text-sm text-gray-400 mb-6">Kick hesabınla giriş yap</p>
+      <button onclick="login()" class="btn-primary w-full py-3">Kick ile Giriş Yap</button>
+      <p class="text-xs text-gray-500 mt-4">Sadece Zentrav admin işlem yapabilir</p>
+    </div>
+  </div>
+
+  <!-- PANEL -->
+  <div id="mainApp" class="hidden min-h-screen p-4">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center font-bold text-black">Z</div>
+          <div>
+            <div class="font-semibold">Zentrav</div>
+            <div class="text-xs text-gray-400">kick.com/zentrav</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="adminBadge" class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded-full hidden">ADMIN</span>
+          <span id="userName" class="text-sm"></span>
+          <button onclick="logout()" class="text-xs text-gray-400">Çıkış</button>
+        </div>
+      </div>
+
+      <div class="card overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-[#2a2f3a]">
+          <h2 class="font-semibold">Yasak Kaldırma Talepleri</h2>
+          <button onclick="speakSelected()" class="text-sm text-blue-400">🔊 Sesli Oku</button>
+        </div>
+
+        <div class="flex" style="min-height:480px">
+          <!-- Sol liste -->
+          <div class="w-64 border-r border-[#2a2f3a] flex flex-col">
+            <div class="p-3">
+              <input type="text" id="search" placeholder="Kullanıcı ara..." oninput="renderList()">
+            </div>
+            <div class="px-3 text-xs text-gray-500" id="count">0 talep</div>
+            <div id="list" class="flex-1 overflow-y-auto"></div>
+          </div>
+
+          <!-- Sağ detay -->
+          <div class="flex-1 p-4">
+            <div id="empty" class="text-center text-gray-500 py-20">Bir talep seçin</div>
+            <div id="detail" class="hidden">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center font-bold" id="dAvatar">?</div>
+                <div>
+                  <div class="font-semibold" id="dName">—</div>
+                  <div class="text-xs text-gray-400" id="dTime">—</div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                <div><div class="text-xs text-gray-500">Yasaklayan</div><div id="dBannedBy">Zentrav</div></div>
+                <div><div class="text-xs text-gray-500">Yasaklama tarihi</div><div id="dBanDate">—</div></div>
+              </div>
+
+              <div class="mb-3">
+                <div class="text-xs text-gray-500 mb-1">Ban Sebebi</div>
+                <div id="dBanReason">No reason provided</div>
+              </div>
+
+              <div class="mb-3">
+                <div class="text-xs text-gray-500 mb-1">İtiraz nedeni</div>
+                <div id="dAppeal" class="bg-[#1a1e27] rounded-lg p-3 text-sm"></div>
+              </div>
+
+              <div class="mb-4">
+                <div class="text-xs text-gray-500 mb-2">Mesajlar</div>
+                <div id="dMessages" class="bg-[#0f1218] rounded-lg p-3 text-sm max-h-36 overflow-y-auto space-y-1"></div>
+              </div>
+
+              <div id="adminBtns" class="flex gap-3 mt-6 hidden">
+                <button class="btn-gray flex-1" onclick="reject()">İtirazı reddet</button>
+                <button class="btn-green flex-1" onclick="unban()">Banı Kaldır</button>
+              </div>
+              <div id="notAdmin" class="text-center text-sm text-gray-500 mt-6 hidden">Sadece Zentrav admin işlem yapabilir</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN = "Zentrav";
+    const OAUTH = "https://id.kick.com/oauth/authorize?response_type=code&client_id=01M170XMJP255VZW7RK3JM8V5B&redirect_uri=https%3A%2F%2Fzentrav.tiiny.site%2F&scope=user%3Aread%20channel%3Amoderate&code_challenge=dpJhVrzqkDTS5VnKIBRFOfBIvYUc84cCQIKhiHVV4Tg&code_challenge_method=S256&state=c444a34e05bc96844c05de5828e96301";
+
+    let state = {
+      user: null,
+      isAdmin: false,
+      selected: null,
+      list: [
+        {
+          id: 1,
+          username: "DelikYorganYedek",
+          time: "1 sa. önce",
+          bannedBy: "Zentrav",
+          banDate: "29.08.2026 18:42",
+          banReason: "No reason provided",
+          appeal: "LAN BEN NAPTIM",
+          messages: [
+            {t:"15:49", m:"abo"},
+            {t:"15:49", m:"yyyyyyyyyy"},
+            {t:"16:33", m:"DelikYorganYedek"},
+            {t:"18:42", m:"1"}
+          ],
+          status: "pending"
+        }
+      ]
+    };
+
+    // Giriş kontrolü
+    const saved = localStorage.getItem("zentrav_user");
+    if (saved || location.search.includes("code=")) {
+      loginSuccess(saved || "Zentrav");
+    }
+
+    function login() {
+      location.href = OAUTH;
+    }
+
+    function loginSuccess(name) {
+      state.user = name;
+      state.isAdmin = name.toLowerCase() === ADMIN.toLowerCase();
+      localStorage.setItem("zentrav_user", name);
+
+      document.getElementById("loginScreen").classList.add("hidden");
+      document.getElementById("mainApp").classList.remove("hidden");
+      document.getElementById("userName").textContent = name;
+
+      if (state.isAdmin) {
+        document.getElementById("adminBadge").classList.remove("hidden");
+        document.getElementById("adminBtns").classList.remove("hidden");
+      } else {
+        document.getElementById("notAdmin").classList.remove("hidden");
+      }
+      renderList();
+    }
+
+    function logout() {
+      localStorage.removeItem("zentrav_user");
+      location.reload();
+    }
+
+    function renderList() {
+      const q = document.getElementById("search").value.toLowerCase();
+      const filtered = state.list.filter(r => r.status === "pending" && r.username.toLowerCase().includes(q));
+      document.getElementById("count").textContent = filtered.length + " talep";
+
+      document.getElementById("list").innerHTML = filtered.map(r => `
+        <div class="request-item px-3 py-2 flex items-center gap-2 ${state.selected===r.id?'active':''}" onclick="select(${r.id})">
+          <div class="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-xs font-bold">${r.username[0]}</div>
+          <div>
+            <div class="text-sm font-medium">${r.username}</div>
+            <div class="text-xs text-gray-500">${r.time}</div>
+          </div>
+        </div>
+      `).join("") || '<div class="p-4 text-center text-gray-500 text-sm">Talep yok</div>';
+    }
+
+    function select(id) {
+      state.selected = id;
+      const r = state.list.find(x => x.id === id);
+      document.getElementById("empty").classList.add("hidden");
+      document.getElementById("detail").classList.remove("hidden");
+
+      document.getElementById("dAvatar").textContent = r.username[0];
+      document.getElementById("dName").textContent = r.username;
+      document.getElementById("dTime").textContent = r.time;
+      document.getElementById("dBannedBy").textContent = r.bannedBy;
+      document.getElementById("dBanDate").textContent = r.banDate;
+      document.getElementById("dBanReason").textContent = r.banReason;
+      document.getElementById("dAppeal").textContent = r.appeal;
+      document.getElementById("dMessages").innerHTML = r.messages.map(m => `<div><span class="text-gray-500 text-xs">${m.t}</span> ${m.m}</div>`).join("");
+      renderList();
+    }
+
+    function unban() {
+      if (!state.isAdmin) return alert("Sadece Zentrav admin olabilir!");
+      const r = state.list.find(x => x.id === state.selected);
+      if (!r) return;
+      if (confirm(r.username + " banını kaldırmak istiyor musun?")) {
+        r.status = "unbanned";
+        speak(r.username + " banı kaldırıldı");
+        alert("Ban kaldırıldı (simülasyon)");
+        state.selected = null;
+        document.getElementById("detail").classList.add("hidden");
+        document.getElementById("empty").classList.remove("hidden");
+        renderList();
+      }
+    }
+
+    function reject() {
+      if (!state.isAdmin) return alert("Sadece Zentrav admin olabilir!");
+      const r = state.list.find(x => x.id === state.selected);
+      if (!r) return;
+      if (confirm(r.username + " itirazını reddetmek istiyor musun?")) {
+        r.status = "rejected";
+        speak(r.username + " itirazı reddedildi");
+        alert("İtiraz reddedildi");
+        state.selected = null;
+        document.getElementById("detail").classList.add("hidden");
+        document.getElementById("empty").classList.remove("hidden");
+        renderList();
+      }
+    }
+
+    // Sesli okuma
+    function speak(text) {
+      if (!window.speechSynthesis) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "tr-TR";
+      u.rate = 1;
+      speechSynthesis.speak(u);
+    }
+
+    function speakSelected() {
+      const r = state.list.find(x => x.id === state.selected);
+      if (!r) return alert("Önce bir talep seç");
+      const text = `${r.username} itiraz etti. Sebep: ${r.appeal}. Ban sebebi: ${r.banReason}`;
+      speak(text);
+    }
+  </script>
+</body>
+</html>
