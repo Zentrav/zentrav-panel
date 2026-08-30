@@ -19,17 +19,11 @@
     .hidden { display: none !important; }
     .tab { display: none; }
     .tab.active { display: block; }
-    input, textarea { background: #0f1218; border: 1px solid #2a2f3a; border-radius: 8px; color: white; padding: 0.5rem 0.75rem; outline: none; }
+    input { background: #0f1218; border: 1px solid #2a2f3a; border-radius: 8px; color: white; padding: 0.5rem 0.75rem; outline: none; }
     .platform-card { border-radius: 12px; padding: 1rem; display: flex; align-items: center; gap: 0.75rem; min-height: 85px; text-decoration: none; color: inherit; }
     .request-item { cursor: pointer; }
     .request-item:hover, .request-item.active { background: #1e2430; }
-    .spin-box {
-      width: 120px; height: 120px;
-      background: linear-gradient(135deg, #53fc18, #3b82f6);
-      border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; font-weight: bold; color: #0d0f14;
-    }
+    .spin-box { width: 120px; height: 120px; background: linear-gradient(135deg, #53fc18, #3b82f6); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: #0d0f14; }
     .spinning { animation: spin 0.12s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   </style>
@@ -51,7 +45,7 @@
         <div class="flex items-center gap-4">
           <div class="flex items-center gap-2">
             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zentrav" class="w-8 h-8 rounded-full bg-gray-800" alt="">
-            <span class="font-semibold">Zentrav</span>
+            <span class="font-semibold" id="headerName">Zentrav</span>
           </div>
           <nav class="flex gap-1">
             <div class="nav-item active" data-tab="home" onclick="switchTab('home')"><i class="fa-solid fa-house"></i> Ana Sayfa</div>
@@ -74,8 +68,8 @@
           <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zentrav" class="w-16 h-16 rounded-full bg-gray-800" alt="">
           <div>
             <div class="text-sm text-gray-400">kick.com/zentrav</div>
-            <h1 class="text-2xl font-bold">Zentrav</h1>
-            <p class="text-sm text-gray-400">Eski tırıcı, yayıncı. Just chatting, IRL ve oyun yayınları.</p>
+            <h1 class="text-2xl font-bold" id="homeName">Zentrav</h1>
+            <p class="text-sm text-gray-400">14 yaşında bir yayıncı</p>
           </div>
         </div>
         <div class="card p-4 mb-6 flex items-start gap-3">
@@ -84,7 +78,7 @@
             <div class="font-medium">Yayın başladığında haberin olsun mu?</div>
             <p class="text-sm text-gray-400">Tarayıcı bildirimlerini açarsan Zentrav yayına her girdiğinde haber veririz.</p>
           </div>
-          <button class="btn-primary text-sm" onclick="this.closest('.card').remove()">Bildirimleri Aç</button>
+          <button class="btn-primary text-sm" onclick="enableNotif()">Bildirimleri Aç</button>
         </div>
         <div class="text-xs font-semibold text-gray-500 uppercase mb-2">Bağlantılar</div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
@@ -128,6 +122,7 @@
               <button class="btn-green text-sm" onclick="addRequest()">Ekle</button>
               <button class="btn-gray text-sm" onclick="hideAddForm()">İptal</button>
             </div>
+            <p id="addError" class="text-red-400 text-sm mt-2 hidden"></p>
           </div>
           <div class="flex" style="min-height:420px">
             <div class="w-64 border-r border-[#2a2f3a] flex flex-col">
@@ -227,10 +222,9 @@
       winnerCount: 1,
       participants: [],
       winners: [],
-      list: JSON.parse(localStorage.getItem("zentrav_appeals") || "null") || []
+      list: []
     };
 
-    // ===== PKCE yardımcıları =====
     function generateRandomString(length) {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
       let result = "";
@@ -244,15 +238,13 @@
       const encoder = new TextEncoder();
       const data = encoder.encode(plain);
       const hash = await crypto.subtle.digest("SHA-256", data);
-      return btoa(String.fromCharCode(...new Uint8Array(hash)))
-        .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      return btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
     }
 
     async function startLogin() {
       const verifier = generateRandomString(64);
       const challenge = await sha256(verifier);
       sessionStorage.setItem("pkce_verifier", verifier);
-
       const params = new URLSearchParams({
         response_type: "code",
         client_id: CLIENT_ID,
@@ -265,12 +257,10 @@
       location.href = "https://id.kick.com/oauth/authorize?" + params.toString();
     }
 
-    // OAuth dönüşü
     async function handleCallback() {
       const params = new URLSearchParams(location.search);
       const code = params.get("code");
       if (!code) return false;
-
       const verifier = sessionStorage.getItem("pkce_verifier") || "";
       try {
         const res = await fetch("/api/token", {
@@ -284,7 +274,6 @@
           document.getElementById("loginError").classList.remove("hidden");
           return false;
         }
-
         const username = data.user?.name || data.user?.username || data.user?.slug || "Bilinmeyen";
         state.accessToken = data.access_token;
         localStorage.setItem("zentrav_token", data.access_token);
@@ -305,8 +294,10 @@
       document.getElementById("loginScreen").classList.add("hidden");
       document.getElementById("mainApp").classList.remove("hidden");
       document.getElementById("userName").textContent = name;
+      document.getElementById("headerName").textContent = name;
+      document.getElementById("homeName").textContent = name;
       if (state.isAdmin) document.getElementById("adminBadge").classList.remove("hidden");
-      renderList();
+      loadAppeals();
     }
 
     function logout() {
@@ -315,15 +306,13 @@
       location.href = "/";
     }
 
-    // Sayfa yüklenince
     (async () => {
       if (location.search.includes("code=")) {
         await handleCallback();
       } else {
         const saved = localStorage.getItem("zentrav_user");
-        const token = localStorage.getItem("zentrav_token");
         if (saved) {
-          state.accessToken = token;
+          state.accessToken = localStorage.getItem("zentrav_token");
           loginSuccess(saved);
         }
       }
@@ -334,40 +323,53 @@
       document.querySelector(`[data-tab="${tab}"]`).classList.add("active");
       document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
       document.getElementById("tab-" + tab).classList.add("active");
+      if (tab === "appeals") loadAppeals();
     }
 
-    function saveList() {
-      localStorage.setItem("zentrav_appeals", JSON.stringify(state.list));
+    // ===== TALEPLER (Backend) =====
+    async function loadAppeals() {
+      try {
+        const res = await fetch("/api/appeals");
+        state.list = await res.json();
+        renderList();
+      } catch (e) {
+        console.error(e);
+      }
     }
 
-    function showAddForm() { document.getElementById("addForm").classList.remove("hidden"); }
+    function showAddForm() { document.getElementById("addForm").classList.remove("hidden"); document.getElementById("addError").classList.add("hidden"); }
     function hideAddForm() { document.getElementById("addForm").classList.add("hidden"); }
 
-    function addRequest() {
+    async function addRequest() {
       const user = document.getElementById("newUser").value.trim();
       const appeal = document.getElementById("newAppeal").value.trim();
       if (!user) return alert("Kullanıcı adı gir");
-      state.list.unshift({
-        id: Date.now(),
-        username: user,
-        time: "Az önce",
-        bannedBy: "Zentrav",
-        banDate: new Date().toLocaleString("tr-TR"),
-        banReason: "No reason provided",
-        appeal: appeal || "Belirtilmedi",
-        status: "pending"
-      });
-      saveList();
-      hideAddForm();
-      document.getElementById("newUser").value = "";
-      document.getElementById("newAppeal").value = "";
-      renderList();
-      speak(user + " talebi eklendi");
+
+      try {
+        const res = await fetch("/api/appeals", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: user, appeal })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          document.getElementById("addError").textContent = data.error || "Hata";
+          document.getElementById("addError").classList.remove("hidden");
+          return;
+        }
+        hideAddForm();
+        document.getElementById("newUser").value = "";
+        document.getElementById("newAppeal").value = "";
+        await loadAppeals();
+        speak(user + " talebi eklendi");
+      } catch (e) {
+        alert("Hata: " + e.message);
+      }
     }
 
     function renderList() {
       const q = (document.getElementById("search")?.value || "").toLowerCase();
-      const filtered = state.list.filter(r => r.status === "pending" && r.username.toLowerCase().includes(q));
+      const filtered = state.list.filter(r => r.username.toLowerCase().includes(q));
       document.getElementById("count").textContent = filtered.length + " talep";
       document.getElementById("list").innerHTML = filtered.map(r => `
         <div class="request-item px-3 py-2 flex items-center gap-2 ${state.selected===r.id?'active':''}" onclick="select(${r.id})">
@@ -405,31 +407,35 @@
       if (!r) return;
       if (!confirm(r.username + " banını kaldırmak istiyor musun?")) return;
 
-      // Şimdilik simülasyon + liste güncelleme
-      // Gerçek unban için user_id lazım (Kick API'den alınmalı)
-      r.status = "unbanned";
-      saveList();
+      await fetch("/api/appeals/" + r.id, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "unbanned" })
+      });
       speak(r.username + " banı kaldırıldı");
-      alert("Ban kaldırıldı (liste güncellendi).\nGerçek Kick unban için kullanıcı ID'si gerekiyor.");
+      alert("Ban kaldırıldı (listeden silindi).\nNot: Gerçek Kick unban için kullanıcı ID'si lazım.");
       state.selected = null;
       document.getElementById("detail").classList.add("hidden");
       document.getElementById("empty").classList.remove("hidden");
-      renderList();
+      await loadAppeals();
     }
 
-    function reject() {
+    async function reject() {
       if (!state.isAdmin) return alert("Sadece Zentrav!");
       const r = state.list.find(x => x.id === state.selected);
       if (!r) return;
-      if (confirm(r.username + " itirazını reddetmek istiyor musun?")) {
-        r.status = "rejected";
-        saveList();
-        speak(r.username + " itirazı reddedildi");
-        state.selected = null;
-        document.getElementById("detail").classList.add("hidden");
-        document.getElementById("empty").classList.remove("hidden");
-        renderList();
-      }
+      if (!confirm(r.username + " itirazını reddetmek istiyor musun?")) return;
+
+      await fetch("/api/appeals/" + r.id, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "rejected" })
+      });
+      speak(r.username + " itirazı reddedildi");
+      state.selected = null;
+      document.getElementById("detail").classList.add("hidden");
+      document.getElementById("empty").classList.remove("hidden");
+      await loadAppeals();
     }
 
     function speak(text) {
@@ -442,6 +448,14 @@
       const r = state.list.find(x => x.id === state.selected);
       if (!r) return alert("Önce talep seç");
       speak(`${r.username} itiraz etti. Sebep: ${r.appeal}`);
+    }
+
+    function enableNotif() {
+      if (!("Notification" in window)) return alert("Tarayıcı desteklemiyor");
+      Notification.requestPermission().then(p => {
+        if (p === "granted") alert("Bildirimler açıldı!");
+        else alert("İzin verilmedi");
+      });
     }
 
     // Çekiliş
@@ -474,7 +488,6 @@
       if (!state.participants.length) return alert("Katılımcı yok");
       const box = document.getElementById("spinBox");
       box.classList.add("spinning");
-      box.textContent = "?";
       document.getElementById("boxStatus").textContent = "Dönüyor...";
       let count = 0;
       const interval = setInterval(() => {
