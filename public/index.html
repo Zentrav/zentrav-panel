@@ -1,470 +1,90 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zentrav Panel</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <style>
-    body { background: #0d0f14; color: #e5e7eb; font-family: system-ui, sans-serif; margin: 0; }
-    .card { background: #151820; border: 1px solid #2a2f3a; border-radius: 12px; }
-    .btn-primary { background: #3b82f6; color: white; border: none; border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; }
-    .btn-green { background: #53fc18; color: #0d0f14; font-weight: 600; border: none; border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; }
-    .btn-gray { background: #2a2f3a; color: #e5e7eb; border: none; border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; }
-    .btn-outline { border: 1px solid #2a2f3a; background: transparent; color: #e5e7eb; border-radius: 8px; padding: 0.4rem 0.9rem; cursor: pointer; }
-    .nav-item { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; border-radius: 9999px; color: #9ca3af; cursor: pointer; font-size: 0.9rem; }
-    .nav-item:hover, .nav-item.active { background: #1e2430; color: white; }
-    .nav-item.active { background: #1e3a5f; color: #93c5fd; }
-    .hidden { display: none !important; }
-    .tab { display: none; }
-    .tab.active { display: block; }
-    input, textarea { background: #0f1218; border: 1px solid #2a2f3a; border-radius: 8px; color: white; padding: 0.5rem 0.75rem; outline: none; }
-    .platform-card { border-radius: 12px; padding: 1rem; display: flex; align-items: center; gap: 0.75rem; min-height: 85px; text-decoration: none; color: inherit; }
-    .request-item { cursor: pointer; }
-    .request-item:hover, .request-item.active { background: #1e2430; }
-    .spin-box {
-      width: 120px; height: 120px;
-      background: linear-gradient(135deg, #53fc18, #3b82f6);
-      border-radius: 16px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; font-weight: bold; color: #0d0f14;
-      transition: transform 0.1s;
-    }
-    .spinning { animation: spin 0.15s linear infinite; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  </style>
-</head>
-<body>
-  <!-- LOGIN -->
-  <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
-    <div class="card p-8 max-w-md w-full text-center">
-      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zentrav" class="w-20 h-20 rounded-full mx-auto mb-4 bg-gray-800" alt="Zentrav">
-      <h1 class="text-xl font-bold mb-1">Zentrav Panel</h1>
-      <p class="text-sm text-gray-400 mb-6">Kick hesabınla giriş yap</p>
-      <button onclick="login()" class="btn-primary w-full py-3">Kick ile Giriş Yap</button>
-    </div>
-  </div>
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
 
-  <!-- MAIN -->
-  <div id="mainApp" class="hidden">
-    <header class="border-b border-[#2a2f3a] sticky top-0 bg-[#0d0f14] z-50">
-      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <div class="flex items-center gap-2">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zentrav" class="w-8 h-8 rounded-full bg-gray-800" alt="">
-            <span class="font-semibold">Zentrav</span>
-          </div>
-          <nav class="flex gap-1">
-            <div class="nav-item active" data-tab="home" onclick="switchTab('home')"><i class="fa-solid fa-house"></i> Ana Sayfa</div>
-            <div class="nav-item" data-tab="appeals" onclick="switchTab('appeals')"><i class="fa-solid fa-gavel"></i> İtirazlar</div>
-            <div class="nav-item" data-tab="raffle" onclick="switchTab('raffle')"><i class="fa-solid fa-gift"></i> Çekiliş</div>
-          </nav>
-        </div>
-        <div class="flex items-center gap-3">
-          <span id="adminBadge" class="text-xs bg-green-900 text-green-300 px-2 py-0.5 rounded-full hidden">ADMIN</span>
-          <span id="userName" class="text-sm"></span>
-          <button onclick="logout()" class="text-xs text-gray-400">Çıkış</button>
-        </div>
-      </div>
-    </header>
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-    <main class="max-w-6xl mx-auto px-4 py-6">
-      <!-- ANA SAYFA -->
-      <div id="tab-home" class="tab active">
-        <div class="flex items-start gap-4 mb-6">
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zentrav" class="w-16 h-16 rounded-full bg-gray-800" alt="Zentrav">
-          <div>
-            <div class="text-sm text-gray-400">kick.com/zentrav</div>
-            <h1 class="text-2xl font-bold">Zentrav</h1>
-            <p class="text-sm text-gray-400">Eski tırıcı, yayıncı. Just chatting, IRL ve oyun yayınları.</p>
-          </div>
-        </div>
+const CLIENT_ID = "01M170XMJP255VZW7RK3JM8V5B";
+const CLIENT_SECRET = "7964256469ff8951a0739e64d872f55dc2c6c6c5a66336874cb1a237078eac3c";
+const REDIRECT_URI = "https://spirited-flow-production-b791.up.railway.app/";
 
-        <div class="card p-4 mb-6 flex items-start gap-3">
-          <div class="w-8 h-8 rounded-full bg-blue-900/40 flex items-center justify-center text-blue-400"><i class="fa-solid fa-bell"></i></div>
-          <div class="flex-1">
-            <div class="font-medium">Yayın başladığında haberin olsun mu?</div>
-            <p class="text-sm text-gray-400">Tarayıcı bildirimlerini açarsan Zentrav yayına her girdiğinde haber veririz.</p>
-          </div>
-          <button class="btn-primary text-sm" onclick="this.closest('.card').remove()">Bildirimleri Aç</button>
-        </div>
+app.use(cors());
+app.use(express.json());
+app.use(express.static("public"));
 
-        <div class="text-xs font-semibold text-gray-500 uppercase mb-2">Bağlantılar</div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
-          <a href="https://kick.com/zentrav" target="_blank" class="platform-card" style="background:linear-gradient(135deg,#0d1f0d,#1a2e1a)">
-            <div class="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center text-black font-bold">K</div>
-            <div><div class="font-semibold">Kick</div><div class="text-xs text-gray-400">kick.com/zentrav</div></div>
-          </a>
-          <a href="#" class="platform-card" style="background:linear-gradient(135deg,#1a1030,#2a1a40)">
-            <div class="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center text-white"><i class="fa-brands fa-twitch"></i></div>
-            <div><div class="font-semibold">Twitch</div><div class="text-xs text-gray-400">twitch.tv/zentrav</div></div>
-          </a>
-          <a href="#" class="platform-card" style="background:linear-gradient(135deg,#2a0a0a,#3a1515)">
-            <div class="w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center text-white"><i class="fa-brands fa-youtube"></i></div>
-            <div><div class="font-semibold">YouTube</div><div class="text-xs text-gray-400">@Zentrav</div></div>
-          </a>
-        </div>
+// OAuth token alma
+app.post("/api/token", async (req, res) => {
+  try {
+    const { code, code_verifier } = req.body;
+    if (!code) return res.status(400).json({ error: "code yok" });
 
-        <div class="text-xs font-semibold text-gray-500 uppercase mb-2">Yayın Durumu</div>
-        <div class="card p-4 flex items-center gap-3">
-          <div class="w-3 h-3 rounded-full bg-gray-500"></div>
-          <span class="font-medium">Zentrav canlı yayını</span>
-          <span class="text-xs bg-gray-700 px-2 py-0.5 rounded">ÇEVRİMDIŞI</span>
-        </div>
-      </div>
-
-      <!-- İTİRAZLAR -->
-      <div id="tab-appeals" class="tab">
-        <div class="card overflow-hidden">
-          <div class="flex items-center justify-between px-4 py-3 border-b border-[#2a2f3a]">
-            <h2 class="font-semibold">Yasak Kaldırma Talepleri</h2>
-            <div class="flex gap-2">
-              <button onclick="speakSelected()" class="text-sm text-blue-400">🔊 Sesli Oku</button>
-              <button onclick="showAddForm()" class="btn-primary text-sm">+ Talep Ekle</button>
-            </div>
-          </div>
-
-          <!-- Manuel ekleme formu -->
-          <div id="addForm" class="hidden p-4 border-b border-[#2a2f3a] bg-[#0f1218]">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-              <input type="text" id="newUser" placeholder="Kullanıcı adı" class="text-sm">
-              <input type="text" id="newAppeal" placeholder="İtiraz nedeni" class="text-sm">
-            </div>
-            <div class="flex gap-2">
-              <button class="btn-green text-sm" onclick="addRequest()">Ekle</button>
-              <button class="btn-gray text-sm" onclick="hideAddForm()">İptal</button>
-            </div>
-          </div>
-
-          <div class="flex" style="min-height:420px">
-            <div class="w-64 border-r border-[#2a2f3a] flex flex-col">
-              <div class="p-3"><input type="text" id="search" placeholder="Kullanıcı ara..." oninput="renderList()" class="w-full text-sm"></div>
-              <div class="px-3 text-xs text-gray-500" id="count">0 talep</div>
-              <div id="list" class="flex-1 overflow-y-auto"></div>
-            </div>
-            <div class="flex-1 p-4">
-              <div id="empty" class="text-center text-gray-500 py-20">Bir talep seçin</div>
-              <div id="detail" class="hidden">
-                <div class="flex items-center gap-3 mb-4">
-                  <div class="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center font-bold" id="dAvatar">?</div>
-                  <div>
-                    <div class="font-semibold" id="dName">—</div>
-                    <div class="text-xs text-gray-400" id="dTime">—</div>
-                  </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4 text-sm mb-4">
-                  <div><div class="text-xs text-gray-500">Yasaklayan</div><div id="dBannedBy">Zentrav</div></div>
-                  <div><div class="text-xs text-gray-500">Yasaklama tarihi</div><div id="dBanDate">—</div></div>
-                </div>
-                <div class="mb-3"><div class="text-xs text-gray-500 mb-1">Ban Sebebi</div><div id="dBanReason">No reason provided</div></div>
-                <div class="mb-3"><div class="text-xs text-gray-500 mb-1">İtiraz nedeni</div><div id="dAppeal" class="bg-[#1a1e27] rounded-lg p-3 text-sm"></div></div>
-                <div id="adminBtns" class="flex gap-3 mt-6 hidden">
-                  <button class="btn-gray flex-1" onclick="reject()">İtirazı reddet</button>
-                  <button class="btn-green flex-1" onclick="unban()">Banı Kaldır</button>
-                </div>
-                <div id="notAdmin" class="text-center text-sm text-gray-500 mt-6 hidden">Sadece Zentrav admin işlem yapabilir</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ÇEKİLİŞ -->
-      <div id="tab-raffle" class="tab">
-        <h1 class="text-xl font-bold mb-1">Kick Çekiliş Aracı</h1>
-        <p class="text-sm text-gray-400 mb-4">Chat katılımını takip et, kutuyu aç, kazananları seç.</p>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div class="space-y-4">
-            <div class="card p-4">
-              <div class="text-sm font-semibold mb-2">Kanal</div>
-              <div class="flex gap-2">
-                <input type="text" id="channel" value="zentrav" class="flex-1 text-sm">
-                <button class="btn-primary text-sm" onclick="connectChannel()">Bağlan</button>
-              </div>
-              <div class="text-xs text-gray-500 mt-2" id="chStatus">• Bağlantı bekleniyor</div>
-            </div>
-            <div class="card p-4">
-              <div class="text-sm font-semibold mb-2">Anahtar kelime</div>
-              <input type="text" id="keyword" value="çekiliş" class="w-full text-sm mb-3">
-              <div class="text-sm font-semibold mb-1">Manuel ekle</div>
-              <div class="flex gap-2">
-                <input type="text" id="manual" placeholder="Kullanıcı adı" class="flex-1 text-sm">
-                <button class="btn-outline text-sm" onclick="addManual()">+</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="card p-6 text-center flex flex-col items-center justify-center min-h-[280px]">
-            <div class="text-xs text-gray-500 mb-3" id="entryCount">0 katılımcı</div>
-            
-            <!-- DÖNEN KUTU -->
-            <div id="spinBox" class="spin-box mb-4">?</div>
-            
-            <div class="font-medium mb-1" id="boxStatus">Katılımcılar bekleniyor</div>
-            <div class="mt-4 flex items-center gap-2 flex-wrap justify-center">
-              <span class="text-sm text-gray-400">Kazanan:</span>
-              <button class="w-8 h-8 rounded bg-[#1e2430] text-sm winner-btn active" data-n="1">1</button>
-              <button class="w-8 h-8 rounded bg-[#0f1218] text-sm winner-btn" data-n="2">2</button>
-              <button class="w-8 h-8 rounded bg-[#0f1218] text-sm winner-btn" data-n="3">3</button>
-              <button class="btn-primary text-sm" onclick="draw()">Kutuyu Aç</button>
-            </div>
-          </div>
-
-          <div class="space-y-4">
-            <div class="card p-4">
-              <div class="flex justify-between mb-2">
-                <div class="text-sm font-semibold">Katılımcılar</div>
-                <span class="text-xs text-gray-500" id="partCount">0</span>
-              </div>
-              <div id="participants" class="text-sm max-h-40 overflow-y-auto space-y-1">
-                <div class="text-center text-gray-500 text-xs py-6">Henüz yok</div>
-              </div>
-              <button class="text-xs text-red-400 mt-2" onclick="clearParts()">Temizle</button>
-            </div>
-            <div class="card p-4">
-              <div class="flex justify-between mb-2">
-                <div class="text-sm font-semibold">Kazananlar</div>
-                <span class="text-xs" id="winCount">0</span>
-              </div>
-              <div id="winners" class="text-sm min-h-[60px]">
-                <div class="text-center text-gray-500 text-xs py-4">Henüz yok</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <script>
-    const ADMIN = "Zentrav";
-    const OAUTH = "https://id.kick.com/oauth/authorize?response_type=code&client_id=01M170XMJP255VZW7RK3JM8V5B&redirect_uri=https%3A%2F%2Fspirited-flow-production-b791.up.railway.app%2F&scope=user%3Aread%20channel%3Amoderate&code_challenge=dpJhVrzqkDTS5VnKIBRFOfBIvYUc84cCQIKhiHVV4Tg&code_challenge_method=S256&state=c444a34e05bc96844c05de5828e96301";
-
-    let state = {
-      user: null,
-      isAdmin: false,
-      selected: null,
-      winnerCount: 1,
-      participants: [],
-      winners: [],
-      list: JSON.parse(localStorage.getItem("zentrav_appeals") || "null") || [
-        {
-          id: 1,
-          username: "DelikYorganYedek",
-          time: "1 sa. önce",
-          bannedBy: "Zentrav",
-          banDate: new Date().toLocaleString("tr-TR"),
-          banReason: "No reason provided",
-          appeal: "LAN BEN NAPTIM",
-          status: "pending"
-        }
-      ]
-    };
-
-    function saveList() {
-      localStorage.setItem("zentrav_appeals", JSON.stringify(state.list));
-    }
-
-    const saved = localStorage.getItem("zentrav_user");
-    if (saved || location.search.includes("code=")) loginSuccess(saved || "Zentrav");
-
-    function login() { location.href = OAUTH; }
-    function logout() { localStorage.removeItem("zentrav_user"); location.reload(); }
-
-    function loginSuccess(name) {
-      state.user = name;
-      state.isAdmin = name.toLowerCase() === ADMIN.toLowerCase();
-      localStorage.setItem("zentrav_user", name);
-      document.getElementById("loginScreen").classList.add("hidden");
-      document.getElementById("mainApp").classList.remove("hidden");
-      document.getElementById("userName").textContent = name;
-      if (state.isAdmin) document.getElementById("adminBadge").classList.remove("hidden");
-      renderList();
-    }
-
-    function switchTab(tab) {
-      document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-      document.querySelector(`[data-tab="${tab}"]`).classList.add("active");
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      document.getElementById("tab-" + tab).classList.add("active");
-    }
-
-    // İTİRAZLAR
-    function showAddForm() { document.getElementById("addForm").classList.remove("hidden"); }
-    function hideAddForm() { document.getElementById("addForm").classList.add("hidden"); }
-
-    function addRequest() {
-      const user = document.getElementById("newUser").value.trim();
-      const appeal = document.getElementById("newAppeal").value.trim();
-      if (!user) return alert("Kullanıcı adı gir");
-      const id = Date.now();
-      state.list.unshift({
-        id,
-        username: user,
-        time: "Az önce",
-        bannedBy: "Zentrav",
-        banDate: new Date().toLocaleString("tr-TR"),
-        banReason: "No reason provided",
-        appeal: appeal || "Belirtilmedi",
-        status: "pending"
-      });
-      saveList();
-      hideAddForm();
-      document.getElementById("newUser").value = "";
-      document.getElementById("newAppeal").value = "";
-      renderList();
-      speak(user + " talebi eklendi");
-    }
-
-    function renderList() {
-      const q = (document.getElementById("search")?.value || "").toLowerCase();
-      const filtered = state.list.filter(r => r.status === "pending" && r.username.toLowerCase().includes(q));
-      document.getElementById("count").textContent = filtered.length + " talep";
-      document.getElementById("list").innerHTML = filtered.map(r => `
-        <div class="request-item px-3 py-2 flex items-center gap-2 ${state.selected===r.id?'active':''}" onclick="select(${r.id})">
-          <div class="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-xs font-bold">${r.username[0]}</div>
-          <div><div class="text-sm font-medium">${r.username}</div><div class="text-xs text-gray-500">${r.time}</div></div>
-        </div>`).join("") || '<div class="p-4 text-center text-gray-500 text-sm">Talep yok</div>';
-    }
-
-    function select(id) {
-      state.selected = id;
-      const r = state.list.find(x => x.id === id);
-      if (!r) return;
-      document.getElementById("empty").classList.add("hidden");
-      document.getElementById("detail").classList.remove("hidden");
-      document.getElementById("dAvatar").textContent = r.username[0];
-      document.getElementById("dName").textContent = r.username;
-      document.getElementById("dTime").textContent = r.time;
-      document.getElementById("dBannedBy").textContent = r.bannedBy;
-      document.getElementById("dBanDate").textContent = r.banDate;
-      document.getElementById("dBanReason").textContent = r.banReason;
-      document.getElementById("dAppeal").textContent = r.appeal;
-
-      if (state.isAdmin) {
-        document.getElementById("adminBtns").classList.remove("hidden");
-        document.getElementById("notAdmin").classList.add("hidden");
-      } else {
-        document.getElementById("adminBtns").classList.add("hidden");
-        document.getElementById("notAdmin").classList.remove("hidden");
-      }
-      renderList();
-    }
-
-    function unban() {
-      if (!state.isAdmin) return alert("Sadece Zentrav!");
-      const r = state.list.find(x => x.id === state.selected);
-      if (!r) return;
-      if (confirm(r.username + " banını kaldırmak istiyor musun?")) {
-        r.status = "unbanned";
-        saveList();
-        speak(r.username + " banı kaldırıldı");
-        alert("Ban kaldırıldı");
-        state.selected = null;
-        document.getElementById("detail").classList.add("hidden");
-        document.getElementById("empty").classList.remove("hidden");
-        renderList();
-      }
-    }
-
-    function reject() {
-      if (!state.isAdmin) return alert("Sadece Zentrav!");
-      const r = state.list.find(x => x.id === state.selected);
-      if (!r) return;
-      if (confirm(r.username + " itirazını reddetmek istiyor musun?")) {
-        r.status = "rejected";
-        saveList();
-        speak(r.username + " itirazı reddedildi");
-        alert("İtiraz reddedildi");
-        state.selected = null;
-        document.getElementById("detail").classList.add("hidden");
-        document.getElementById("empty").classList.remove("hidden");
-        renderList();
-      }
-    }
-
-    function speak(text) {
-      if (!window.speechSynthesis) return;
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = "tr-TR";
-      speechSynthesis.speak(u);
-    }
-
-    function speakSelected() {
-      const r = state.list.find(x => x.id === state.selected);
-      if (!r) return alert("Önce talep seç");
-      speak(`${r.username} itiraz etti. Sebep: ${r.appeal}`);
-    }
-
-    // ÇEKİLİŞ
-    document.querySelectorAll(".winner-btn").forEach(btn => {
-      btn.onclick = () => {
-        document.querySelectorAll(".winner-btn").forEach(b => {
-          b.classList.remove("active", "bg-[#1e2430]");
-          b.classList.add("bg-[#0f1218]");
-        });
-        btn.classList.add("active", "bg-[#1e2430]");
-        btn.classList.remove("bg-[#0f1218]");
-        state.winnerCount = +btn.dataset.n;
-      };
+    const params = new URLSearchParams({
+      grant_type: "authorization_code",
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      redirect_uri: REDIRECT_URI,
+      code: code,
+      code_verifier: code_verifier || ""
     });
 
-    function connectChannel() {
-      document.getElementById("chStatus").innerHTML = '• <span class="text-green-400">Bağlandı</span>';
-      ["viewer1","gamerx","chatter99","kickfan","mod_ali"].forEach(u => {
-        if (!state.participants.includes(u)) state.participants.push(u);
-      });
-      renderParts();
+    const tokenRes = await fetch("https://id.kick.com/oauth/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params
+    });
+
+    const tokenData = await tokenRes.json();
+    if (!tokenRes.ok) {
+      return res.status(400).json({ error: "Token alınamadı", details: tokenData });
     }
 
-    function addManual() {
-      const name = document.getElementById("manual").value.trim();
-      if (!name || state.participants.includes(name)) return;
-      state.participants.push(name);
-      document.getElementById("manual").value = "";
-      renderParts();
+    // Kullanıcı bilgisini al
+    const userRes = await fetch("https://api.kick.com/public/v1/users", {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` }
+    });
+    const userData = await userRes.json();
+
+    res.json({
+      access_token: tokenData.access_token,
+      user: userData.data?.[0] || userData
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Ban kaldır (unban)
+app.post("/api/unban", async (req, res) => {
+  try {
+    const { access_token, broadcaster_user_id, user_id } = req.body;
+    if (!access_token || !user_id) {
+      return res.status(400).json({ error: "Eksik parametre" });
     }
 
-    function renderParts() {
-      document.getElementById("partCount").textContent = state.participants.length;
-      document.getElementById("entryCount").textContent = state.participants.length + " katılımcı";
-      document.getElementById("participants").innerHTML = state.participants.map(p => `<div class="px-2 py-1">${p}</div>`).join("") || '<div class="text-center text-gray-500 text-xs py-6">Henüz yok</div>';
-    }
+    const unbanRes = await fetch("https://api.kick.com/public/v1/moderation/bans", {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        broadcaster_user_id: broadcaster_user_id,
+        user_id: user_id
+      })
+    });
 
-    function clearParts() {
-      state.participants = [];
-      renderParts();
-    }
+    const data = await unbanRes.json();
+    res.json({ success: unbanRes.ok, data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-    function draw() {
-      if (!state.participants.length) return alert("Katılımcı yok");
-      
-      const box = document.getElementById("spinBox");
-      box.classList.add("spinning");
-      box.textContent = "?";
-      document.getElementById("boxStatus").textContent = "Dönüyor...";
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
-      let count = 0;
-      const interval = setInterval(() => {
-        const random = state.participants[Math.floor(Math.random() * state.participants.length)];
-        box.textContent = random.substring(0, 2).toUpperCase();
-        count++;
-        if (count > 20) {
-          clearInterval(interval);
-          box.classList.remove("spinning");
-          
-          const shuffled = [...state.participants].sort(() => Math.random() - 0.5);
-          state.winners = shuffled.slice(0, state.winnerCount);
-          document.getElementById("winCount").textContent = state.winners.length;
-          document.getElementById("winners").innerHTML = state.winners.map((w,i) => `<div class="px-2 py-1 font-medium">#${i+1} ${w}</div>`).join("");
-          document.getElementById("boxStatus").textContent = "Kazananlar belli!";
-          box.textContent = state.winners[0].substring(0, 2).toUpperCase();
-          speak("Kazananlar: " + state.winners.join(", "));
-        }
-      }, 100);
-    }
-  </script>
-</body>
-</html>
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
+});
