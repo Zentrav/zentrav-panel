@@ -19,17 +19,27 @@
     .hidden { display: none !important; }
     .tab { display: none; }
     .tab.active { display: block; }
-    input { background: #0f1218; border: 1px solid #2a2f3a; border-radius: 8px; color: white; padding: 0.5rem 0.75rem; outline: none; }
+    input, textarea { background: #0f1218; border: 1px solid #2a2f3a; border-radius: 8px; color: white; padding: 0.5rem 0.75rem; outline: none; }
     .platform-card { border-radius: 12px; padding: 1rem; display: flex; align-items: center; gap: 0.75rem; min-height: 85px; text-decoration: none; color: inherit; }
     .request-item { cursor: pointer; }
     .request-item:hover, .request-item.active { background: #1e2430; }
+    .spin-box {
+      width: 120px; height: 120px;
+      background: linear-gradient(135deg, #53fc18, #3b82f6);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: bold; color: #0d0f14;
+      transition: transform 0.1s;
+    }
+    .spinning { animation: spin 0.15s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
   <!-- LOGIN -->
   <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
     <div class="card p-8 max-w-md w-full text-center">
-      <div class="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-blue-500 mx-auto mb-4 flex items-center justify-center text-2xl font-bold text-black">Z</div>
+      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zentrav" class="w-20 h-20 rounded-full mx-auto mb-4 bg-gray-800" alt="Zentrav">
       <h1 class="text-xl font-bold mb-1">Zentrav Panel</h1>
       <p class="text-sm text-gray-400 mb-6">Kick hesabınla giriş yap</p>
       <button onclick="login()" class="btn-primary w-full py-3">Kick ile Giriş Yap</button>
@@ -42,7 +52,7 @@
       <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-4">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center font-bold text-black text-sm">Z</div>
+            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zentrav" class="w-8 h-8 rounded-full bg-gray-800" alt="">
             <span class="font-semibold">Zentrav</span>
           </div>
           <nav class="flex gap-1">
@@ -63,7 +73,7 @@
       <!-- ANA SAYFA -->
       <div id="tab-home" class="tab active">
         <div class="flex items-start gap-4 mb-6">
-          <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center text-2xl font-bold text-black">Z</div>
+          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zentrav" class="w-16 h-16 rounded-full bg-gray-800" alt="Zentrav">
           <div>
             <div class="text-sm text-gray-400">kick.com/zentrav</div>
             <h1 class="text-2xl font-bold">Zentrav</h1>
@@ -81,11 +91,6 @@
         </div>
 
         <div class="text-xs font-semibold text-gray-500 uppercase mb-2">Bağlantılar</div>
-        <div class="flex justify-between items-center mb-3">
-          <h2 class="text-lg font-semibold">Zentrav'ı takip et</h2>
-          <div class="text-right text-xs text-gray-500">TOPLAM TOPLULUK<br><span class="text-xl font-bold text-white">0</span></div>
-        </div>
-
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
           <a href="https://kick.com/zentrav" target="_blank" class="platform-card" style="background:linear-gradient(135deg,#0d1f0d,#1a2e1a)">
             <div class="w-10 h-10 rounded-lg bg-green-500 flex items-center justify-center text-black font-bold">K</div>
@@ -114,9 +119,25 @@
         <div class="card overflow-hidden">
           <div class="flex items-center justify-between px-4 py-3 border-b border-[#2a2f3a]">
             <h2 class="font-semibold">Yasak Kaldırma Talepleri</h2>
-            <button onclick="speakSelected()" class="text-sm text-blue-400">🔊 Sesli Oku</button>
+            <div class="flex gap-2">
+              <button onclick="speakSelected()" class="text-sm text-blue-400">🔊 Sesli Oku</button>
+              <button onclick="showAddForm()" class="btn-primary text-sm">+ Talep Ekle</button>
+            </div>
           </div>
-          <div class="flex" style="min-height:460px">
+
+          <!-- Manuel ekleme formu -->
+          <div id="addForm" class="hidden p-4 border-b border-[#2a2f3a] bg-[#0f1218]">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+              <input type="text" id="newUser" placeholder="Kullanıcı adı" class="text-sm">
+              <input type="text" id="newAppeal" placeholder="İtiraz nedeni" class="text-sm">
+            </div>
+            <div class="flex gap-2">
+              <button class="btn-green text-sm" onclick="addRequest()">Ekle</button>
+              <button class="btn-gray text-sm" onclick="hideAddForm()">İptal</button>
+            </div>
+          </div>
+
+          <div class="flex" style="min-height:420px">
             <div class="w-64 border-r border-[#2a2f3a] flex flex-col">
               <div class="p-3"><input type="text" id="search" placeholder="Kullanıcı ara..." oninput="renderList()" class="w-full text-sm"></div>
               <div class="px-3 text-xs text-gray-500" id="count">0 talep</div>
@@ -138,7 +159,6 @@
                 </div>
                 <div class="mb-3"><div class="text-xs text-gray-500 mb-1">Ban Sebebi</div><div id="dBanReason">No reason provided</div></div>
                 <div class="mb-3"><div class="text-xs text-gray-500 mb-1">İtiraz nedeni</div><div id="dAppeal" class="bg-[#1a1e27] rounded-lg p-3 text-sm"></div></div>
-                <div class="mb-4"><div class="text-xs text-gray-500 mb-2">Mesajlar</div><div id="dMessages" class="bg-[#0f1218] rounded-lg p-3 text-sm max-h-36 overflow-y-auto space-y-1"></div></div>
                 <div id="adminBtns" class="flex gap-3 mt-6 hidden">
                   <button class="btn-gray flex-1" onclick="reject()">İtirazı reddet</button>
                   <button class="btn-green flex-1" onclick="unban()">Banı Kaldır</button>
@@ -176,9 +196,12 @@
             </div>
           </div>
 
-          <div class="card p-6 text-center flex flex-col items-center justify-center min-h-[260px]">
-            <div class="text-xs text-gray-500 mb-2" id="entryCount">0 katılımcı</div>
-            <div class="w-14 h-14 rounded-full bg-[#1a1e27] flex items-center justify-center mb-3"><i class="fa-solid fa-users text-xl text-gray-500"></i></div>
+          <div class="card p-6 text-center flex flex-col items-center justify-center min-h-[280px]">
+            <div class="text-xs text-gray-500 mb-3" id="entryCount">0 katılımcı</div>
+            
+            <!-- DÖNEN KUTU -->
+            <div id="spinBox" class="spin-box mb-4">?</div>
+            
             <div class="font-medium mb-1" id="boxStatus">Katılımcılar bekleniyor</div>
             <div class="mt-4 flex items-center gap-2 flex-wrap justify-center">
               <span class="text-sm text-gray-400">Kazanan:</span>
@@ -226,18 +249,23 @@
       winnerCount: 1,
       participants: [],
       winners: [],
-      list: [{
-        id: 1,
-        username: "DelikYorganYedek",
-        time: "1 sa. önce",
-        bannedBy: "Zentrav",
-        banDate: "29.08.2026 18:42",
-        banReason: "No reason provided",
-        appeal: "LAN BEN NAPTIM",
-        messages: [{t:"15:49",m:"abo"},{t:"15:49",m:"yyyyyyyyyy"},{t:"16:33",m:"DelikYorganYedek"},{t:"18:42",m:"1"}],
-        status: "pending"
-      }]
+      list: JSON.parse(localStorage.getItem("zentrav_appeals") || "null") || [
+        {
+          id: 1,
+          username: "DelikYorganYedek",
+          time: "1 sa. önce",
+          bannedBy: "Zentrav",
+          banDate: new Date().toLocaleString("tr-TR"),
+          banReason: "No reason provided",
+          appeal: "LAN BEN NAPTIM",
+          status: "pending"
+        }
+      ]
     };
+
+    function saveList() {
+      localStorage.setItem("zentrav_appeals", JSON.stringify(state.list));
+    }
 
     const saved = localStorage.getItem("zentrav_user");
     if (saved || location.search.includes("code=")) loginSuccess(saved || "Zentrav");
@@ -252,12 +280,7 @@
       document.getElementById("loginScreen").classList.add("hidden");
       document.getElementById("mainApp").classList.remove("hidden");
       document.getElementById("userName").textContent = name;
-      if (state.isAdmin) {
-        document.getElementById("adminBadge").classList.remove("hidden");
-        document.getElementById("adminBtns")?.classList.remove("hidden");
-      } else {
-        document.getElementById("notAdmin")?.classList.remove("hidden");
-      }
+      if (state.isAdmin) document.getElementById("adminBadge").classList.remove("hidden");
       renderList();
     }
 
@@ -269,6 +292,32 @@
     }
 
     // İTİRAZLAR
+    function showAddForm() { document.getElementById("addForm").classList.remove("hidden"); }
+    function hideAddForm() { document.getElementById("addForm").classList.add("hidden"); }
+
+    function addRequest() {
+      const user = document.getElementById("newUser").value.trim();
+      const appeal = document.getElementById("newAppeal").value.trim();
+      if (!user) return alert("Kullanıcı adı gir");
+      const id = Date.now();
+      state.list.unshift({
+        id,
+        username: user,
+        time: "Az önce",
+        bannedBy: "Zentrav",
+        banDate: new Date().toLocaleString("tr-TR"),
+        banReason: "No reason provided",
+        appeal: appeal || "Belirtilmedi",
+        status: "pending"
+      });
+      saveList();
+      hideAddForm();
+      document.getElementById("newUser").value = "";
+      document.getElementById("newAppeal").value = "";
+      renderList();
+      speak(user + " talebi eklendi");
+    }
+
     function renderList() {
       const q = (document.getElementById("search")?.value || "").toLowerCase();
       const filtered = state.list.filter(r => r.status === "pending" && r.username.toLowerCase().includes(q));
@@ -283,6 +332,7 @@
     function select(id) {
       state.selected = id;
       const r = state.list.find(x => x.id === id);
+      if (!r) return;
       document.getElementById("empty").classList.add("hidden");
       document.getElementById("detail").classList.remove("hidden");
       document.getElementById("dAvatar").textContent = r.username[0];
@@ -292,10 +342,13 @@
       document.getElementById("dBanDate").textContent = r.banDate;
       document.getElementById("dBanReason").textContent = r.banReason;
       document.getElementById("dAppeal").textContent = r.appeal;
-      document.getElementById("dMessages").innerHTML = r.messages.map(m => `<div><span class="text-gray-500 text-xs">${m.t}</span> ${m.m}</div>`).join("");
+
       if (state.isAdmin) {
         document.getElementById("adminBtns").classList.remove("hidden");
         document.getElementById("notAdmin").classList.add("hidden");
+      } else {
+        document.getElementById("adminBtns").classList.add("hidden");
+        document.getElementById("notAdmin").classList.remove("hidden");
       }
       renderList();
     }
@@ -303,10 +356,12 @@
     function unban() {
       if (!state.isAdmin) return alert("Sadece Zentrav!");
       const r = state.list.find(x => x.id === state.selected);
+      if (!r) return;
       if (confirm(r.username + " banını kaldırmak istiyor musun?")) {
         r.status = "unbanned";
+        saveList();
         speak(r.username + " banı kaldırıldı");
-        alert("Ban kaldırıldı (simülasyon)");
+        alert("Ban kaldırıldı");
         state.selected = null;
         document.getElementById("detail").classList.add("hidden");
         document.getElementById("empty").classList.remove("hidden");
@@ -317,8 +372,10 @@
     function reject() {
       if (!state.isAdmin) return alert("Sadece Zentrav!");
       const r = state.list.find(x => x.id === state.selected);
+      if (!r) return;
       if (confirm(r.username + " itirazını reddetmek istiyor musun?")) {
         r.status = "rejected";
+        saveList();
         speak(r.username + " itirazı reddedildi");
         alert("İtiraz reddedildi");
         state.selected = null;
@@ -344,8 +401,12 @@
     // ÇEKİLİŞ
     document.querySelectorAll(".winner-btn").forEach(btn => {
       btn.onclick = () => {
-        document.querySelectorAll(".winner-btn").forEach(b => b.classList.remove("active","bg-[#1e2430]"));
-        btn.classList.add("active","bg-[#1e2430]");
+        document.querySelectorAll(".winner-btn").forEach(b => {
+          b.classList.remove("active", "bg-[#1e2430]");
+          b.classList.add("bg-[#0f1218]");
+        });
+        btn.classList.add("active", "bg-[#1e2430]");
+        btn.classList.remove("bg-[#0f1218]");
         state.winnerCount = +btn.dataset.n;
       };
     });
@@ -379,12 +440,30 @@
 
     function draw() {
       if (!state.participants.length) return alert("Katılımcı yok");
-      const shuffled = [...state.participants].sort(() => Math.random() - 0.5);
-      state.winners = shuffled.slice(0, state.winnerCount);
-      document.getElementById("winCount").textContent = state.winners.length;
-      document.getElementById("winners").innerHTML = state.winners.map((w,i) => `<div class="px-2 py-1">#${i+1} ${w}</div>`).join("");
-      document.getElementById("boxStatus").textContent = "Kutu açıldı!";
-      speak("Kazananlar: " + state.winners.join(", "));
+      
+      const box = document.getElementById("spinBox");
+      box.classList.add("spinning");
+      box.textContent = "?";
+      document.getElementById("boxStatus").textContent = "Dönüyor...";
+
+      let count = 0;
+      const interval = setInterval(() => {
+        const random = state.participants[Math.floor(Math.random() * state.participants.length)];
+        box.textContent = random.substring(0, 2).toUpperCase();
+        count++;
+        if (count > 20) {
+          clearInterval(interval);
+          box.classList.remove("spinning");
+          
+          const shuffled = [...state.participants].sort(() => Math.random() - 0.5);
+          state.winners = shuffled.slice(0, state.winnerCount);
+          document.getElementById("winCount").textContent = state.winners.length;
+          document.getElementById("winners").innerHTML = state.winners.map((w,i) => `<div class="px-2 py-1 font-medium">#${i+1} ${w}</div>`).join("");
+          document.getElementById("boxStatus").textContent = "Kazananlar belli!";
+          box.textContent = state.winners[0].substring(0, 2).toUpperCase();
+          speak("Kazananlar: " + state.winners.join(", "));
+        }
+      }, 100);
     }
   </script>
 </body>
