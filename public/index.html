@@ -109,7 +109,8 @@
 
   <script>
     const ADMIN = "Zentrav";
-    const OAUTH = "https://id.kick.com/oauth/authorize?response_type=code&client_id=01M170XMJP255VZW7RK3JM8V5B&redirect_uri=https%3A%2F%2Fzentrav.tiiny.site%2F&scope=user%3Aread%20channel%3Amoderate&code_challenge=dpJhVrzqkDTS5VnKIBRFOfBIvYUc84cCQIKhiHVV4Tg&code_challenge_method=S256&state=c444a34e05bc96844c05de5828e96301";
+    // YENİ RAILWAY ADRESİ
+    const OAUTH = "https://id.kick.com/oauth/authorize?response_type=code&client_id=01M170XMJP255VZW7RK3JM8V5B&redirect_uri=https%3A%2F%2Fspirited-flow-production-b791.up.railway.app%2F&scope=user%3Aread%20channel%3Amoderate&code_challenge=dpJhVrzqkDTS5VnKIBRFOfBIvYUc84cCQIKhiHVV4Tg&code_challenge_method=S256&state=c444a34e05bc96844c05de5828e96301";
 
     let state = {
       user: null,
@@ -135,7 +136,6 @@
       ]
     };
 
-    // Giriş kontrolü
     const saved = localStorage.getItem("zentrav_user");
     if (saved || location.search.includes("code=")) {
       loginSuccess(saved || "Zentrav");
@@ -231,7 +231,6 @@
       }
     }
 
-    // Sesli okuma
     function speak(text) {
       if (!window.speechSynthesis) return;
       const u = new SpeechSynthesisUtterance(text);
