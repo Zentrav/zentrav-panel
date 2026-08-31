@@ -62,7 +62,6 @@
     </header>
 
     <main class="max-w-6xl mx-auto px-4 py-6">
-      <!-- ANA SAYFA -->
       <div id="tab-home" class="tab active">
         <div class="flex items-start gap-4 mb-6">
           <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zentrav" class="w-16 h-16 rounded-full bg-gray-800" alt="">
@@ -103,7 +102,6 @@
         </div>
       </div>
 
-      <!-- İTİRAZLAR -->
       <div id="tab-appeals" class="tab">
         <div class="card overflow-hidden">
           <div class="flex items-center justify-between px-4 py-3 border-b border-[#2a2f3a]">
@@ -148,16 +146,16 @@
                 <div class="mb-3"><div class="text-xs text-gray-500 mb-1">İtiraz nedeni</div><div id="dAppeal" class="bg-[#1a1e27] rounded-lg p-3 text-sm"></div></div>
                 <div id="adminBtns" class="flex gap-3 mt-6 hidden">
                   <button class="btn-gray flex-1" onclick="reject()">İtirazı reddet</button>
-                  <button class="btn-green flex-1" onclick="unban()">Banı Kaldır</button>
+                  <button class="btn-green flex-1" id="unbanBtn" onclick="unban()">Banı Kaldır</button>
                 </div>
                 <div id="notAdmin" class="text-center text-sm text-gray-500 mt-6 hidden">Sadece Zentrav admin işlem yapabilir</div>
+                <p id="unbanError" class="text-red-400 text-sm mt-3 hidden"></p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ÇEKİLİŞ -->
       <div id="tab-raffle" class="tab">
         <h1 class="text-xl font-bold mb-1">Kick Çekiliş Aracı</h1>
         <p class="text-sm text-gray-400 mb-4">Chat katılımını takip et, kutuyu aç, kazananları seç.</p>
@@ -249,7 +247,7 @@
         response_type: "code",
         client_id: CLIENT_ID,
         redirect_uri: REDIRECT_URI,
-        scope: "user:read channel:moderate",
+        scope: "user:read channel:moderate moderation:ban",
         code_challenge: challenge,
         code_challenge_method: "S256",
         state: generateRandomString(16)
@@ -326,25 +324,24 @@
       if (tab === "appeals") loadAppeals();
     }
 
-    // ===== TALEPLER (Backend) =====
     async function loadAppeals() {
       try {
         const res = await fetch("/api/appeals");
         state.list = await res.json();
         renderList();
-      } catch (e) {
-        console.error(e);
-      }
+      } catch (e) { console.error(e); }
     }
 
-    function showAddForm() { document.getElementById("addForm").classList.remove("hidden"); document.getElementById("addError").classList.add("hidden"); }
+    function showAddForm() {
+      document.getElementById("addForm").classList.remove("hidden");
+      document.getElementById("addError").classList.add("hidden");
+    }
     function hideAddForm() { document.getElementById("addForm").classList.add("hidden"); }
 
     async function addRequest() {
       const user = document.getElementById("newUser").value.trim();
       const appeal = document.getElementById("newAppeal").value.trim();
       if (!user) return alert("Kullanıcı adı gir");
-
       try {
         const res = await fetch("/api/appeals", {
           method: "POST",
@@ -384,6 +381,7 @@
       if (!r) return;
       document.getElementById("empty").classList.add("hidden");
       document.getElementById("detail").classList.remove("hidden");
+      document.getElementById("unbanError").classList.add("hidden");
       document.getElementById("dAvatar").textContent = r.username[0];
       document.getElementById("dName").textContent = r.username;
       document.getElementById("dTime").textContent = r.time;
@@ -407,17 +405,42 @@
       if (!r) return;
       if (!confirm(r.username + " banını kaldırmak istiyor musun?")) return;
 
-      await fetch("/api/appeals/" + r.id, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "unbanned" })
-      });
-      speak(r.username + " banı kaldırıldı");
-      alert("Ban kaldırıldı (listeden silindi).\nNot: Gerçek Kick unban için kullanıcı ID'si lazım.");
-      state.selected = null;
-      document.getElementById("detail").classList.add("hidden");
-      document.getElementById("empty").classList.remove("hidden");
-      await loadAppeals();
+      const btn = document.getElementById("unbanBtn");
+      const errEl = document.getElementById("unbanError");
+      btn.disabled = true;
+      btn.textContent = "İşleniyor...";
+      errEl.classList.add("hidden");
+
+      try {
+        const res = await fetch("/api/unban", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            access_token: state.accessToken || localStorage.getItem("zentrav_token"),
+            username: r.username,
+            appeal_id: r.id
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || "Unban başarısız";
+          errEl.classList.remove("hidden");
+          btn.disabled = false;
+          btn.textContent = "Banı Kaldır";
+          return;
+        }
+        speak(r.username + " banı kaldırıldı");
+        alert("Başarılı: " + r.username + " banı Kick'te kaldırıldı.");
+        state.selected = null;
+        document.getElementById("detail").classList.add("hidden");
+        document.getElementById("empty").classList.remove("hidden");
+        await loadAppeals();
+      } catch (e) {
+        errEl.textContent = e.message;
+        errEl.classList.remove("hidden");
+      }
+      btn.disabled = false;
+      btn.textContent = "Banı Kaldır";
     }
 
     async function reject() {
@@ -425,7 +448,6 @@
       const r = state.list.find(x => x.id === state.selected);
       if (!r) return;
       if (!confirm(r.username + " itirazını reddetmek istiyor musun?")) return;
-
       await fetch("/api/appeals/" + r.id, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -453,22 +475,27 @@
     function enableNotif() {
       if (!("Notification" in window)) return alert("Tarayıcı desteklemiyor");
       Notification.requestPermission().then(p => {
-        if (p === "granted") alert("Bildirimler açıldı!");
-        else alert("İzin verilmedi");
+        alert(p === "granted" ? "Bildirimler açıldı!" : "İzin verilmedi");
       });
     }
 
-    // Çekiliş
     document.querySelectorAll(".winner-btn").forEach(btn => {
       btn.onclick = () => {
-        document.querySelectorAll(".winner-btn").forEach(b => { b.classList.remove("active","bg-[#1e2430]"); b.classList.add("bg-[#0f1218]"); });
-        btn.classList.add("active","bg-[#1e2430]"); btn.classList.remove("bg-[#0f1218]");
+        document.querySelectorAll(".winner-btn").forEach(b => {
+          b.classList.remove("active", "bg-[#1e2430]");
+          b.classList.add("bg-[#0f1218]");
+        });
+        btn.classList.add("active", "bg-[#1e2430]");
+        btn.classList.remove("bg-[#0f1218]");
         state.winnerCount = +btn.dataset.n;
       };
     });
+
     function connectChannel() {
       document.getElementById("chStatus").innerHTML = '• <span class="text-green-400">Bağlandı</span>';
-      ["viewer1","gamerx","chatter99","kickfan","mod_ali"].forEach(u => { if (!state.participants.includes(u)) state.participants.push(u); });
+      ["viewer1", "gamerx", "chatter99", "kickfan", "mod_ali"].forEach(u => {
+        if (!state.participants.includes(u)) state.participants.push(u);
+      });
       renderParts();
     }
     function addManual() {
@@ -481,7 +508,9 @@
     function renderParts() {
       document.getElementById("partCount").textContent = state.participants.length;
       document.getElementById("entryCount").textContent = state.participants.length + " katılımcı";
-      document.getElementById("participants").innerHTML = state.participants.map(p => `<div class="px-2 py-1">${p}</div>`).join("") || '<div class="text-center text-gray-500 text-xs py-6">Henüz yok</div>';
+      document.getElementById("participants").innerHTML = state.participants.map(p =>
+        `<div class="px-2 py-1">${p}</div>`
+      ).join("") || '<div class="text-center text-gray-500 text-xs py-6">Henüz yok</div>';
     }
     function clearParts() { state.participants = []; renderParts(); }
     function draw() {
@@ -500,7 +529,9 @@
           const shuffled = [...state.participants].sort(() => Math.random() - 0.5);
           state.winners = shuffled.slice(0, state.winnerCount);
           document.getElementById("winCount").textContent = state.winners.length;
-          document.getElementById("winners").innerHTML = state.winners.map((w,i) => `<div class="px-2 py-1 font-medium">#${i+1} ${w}</div>`).join("");
+          document.getElementById("winners").innerHTML = state.winners.map((w, i) =>
+            `<div class="px-2 py-1 font-medium">#${i + 1} ${w}</div>`
+          ).join("");
           document.getElementById("boxStatus").textContent = "Kazananlar belli!";
           box.textContent = state.winners[0].substring(0, 2).toUpperCase();
           speak("Kazananlar: " + state.winners.join(", "));
