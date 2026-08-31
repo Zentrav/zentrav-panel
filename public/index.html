@@ -7,23 +7,43 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <style>
-    body { background: #0d0f14; color: #e5e7eb; font-family: system-ui, sans-serif; margin: 0; }
-    .card { background: #151820; border: 1px solid #2a2f3a; border-radius: 12px; }
-    .btn-primary { background: #3b82f6; color: white; border: none; border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; }
-    .btn-green { background: #53fc18; color: #0d0f14; font-weight: 600; border: none; border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; }
-    .btn-gray { background: #2a2f3a; color: #e5e7eb; border: none; border-radius: 8px; padding: 0.5rem 1rem; cursor: pointer; }
-    .btn-outline { border: 1px solid #2a2f3a; background: transparent; color: #e5e7eb; border-radius: 8px; padding: 0.4rem 0.9rem; cursor: pointer; }
-    .nav-item { display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; border-radius: 9999px; color: #9ca3af; cursor: pointer; font-size: 0.9rem; }
-    .nav-item:hover, .nav-item.active { background: #1e2430; color: white; }
+    body { background: #0b0d12; color: #e5e7eb; font-family: system-ui, sans-serif; margin: 0; }
+    .card { background: #141820; border: 1px solid #2a2f3a; border-radius: 14px; }
+    .btn-primary { background: #3b82f6; color: white; border: none; border-radius: 10px; padding: 0.5rem 1rem; cursor: pointer; font-weight: 600; }
+    .btn-green { background: #53fc18; color: #0d0f14; font-weight: 700; border: none; border-radius: 10px; padding: 0.5rem 1rem; cursor: pointer; }
+    .btn-gray { background: #2a2f3a; color: #e5e7eb; border: none; border-radius: 10px; padding: 0.5rem 1rem; cursor: pointer; }
+    .btn-outline { border: 1px solid #2a2f3a; background: transparent; color: #e5e7eb; border-radius: 10px; padding: 0.4rem 0.9rem; cursor: pointer; }
+    .nav-item { display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.95rem; border-radius: 9999px; color: #9ca3af; cursor: pointer; font-size: 0.9rem; }
+    .nav-item:hover, .nav-item.active { background: #1c2330; color: white; }
     .nav-item.active { background: #1e3a5f; color: #93c5fd; }
     .hidden { display: none !important; }
     .tab { display: none; }
     .tab.active { display: block; }
-    input { background: #0f1218; border: 1px solid #2a2f3a; border-radius: 8px; color: white; padding: 0.5rem 0.75rem; outline: none; }
-    .platform-card { border-radius: 12px; padding: 1rem; display: flex; align-items: center; gap: 0.75rem; min-height: 85px; text-decoration: none; color: inherit; }
+    input { background: #0f1218; border: 1px solid #2a2f3a; border-radius: 10px; color: white; padding: 0.5rem 0.75rem; outline: none; }
+    .platform-card { border-radius: 14px; padding: 1rem; display: flex; align-items: center; gap: 0.75rem; min-height: 85px; text-decoration: none; color: inherit; }
     .request-item { cursor: pointer; }
-    .request-item:hover, .request-item.active { background: #1e2430; }
-    .spin-box { width: 120px; height: 120px; background: linear-gradient(135deg, #53fc18, #3b82f6); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: #0d0f14; }
+    .request-item:hover, .request-item.active { background: #1c2330; }
+    .logo {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #7dd3fc, #22c55e 45%, #3b82f6 80%);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 18px rgba(83, 252, 24, 0.35);
+      font-weight: 800; color: #0b0d12; font-size: 1.1rem;
+    }
+    .logo-lg {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #7dd3fc, #22c55e 45%, #3b82f6 80%);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 28px rgba(83, 252, 24, 0.4);
+      font-weight: 800; color: #0b0d12; font-size: 1.8rem;
+    }
+    .spin-box {
+      width: 120px; height: 120px;
+      background: linear-gradient(135deg, #53fc18, #3b82f6);
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: bold; color: #0d0f14;
+    }
     .spinning { animation: spin 0.12s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   </style>
@@ -31,7 +51,7 @@
 <body>
   <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
     <div class="card p-8 max-w-md w-full text-center">
-      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zentrav" class="w-20 h-20 rounded-full mx-auto mb-4 bg-gray-800" alt="">
+      <div class="logo-lg mx-auto mb-4">Z</div>
       <h1 class="text-xl font-bold mb-1">Zentrav Panel</h1>
       <p class="text-sm text-gray-400 mb-6">Kick hesabınla giriş yap</p>
       <button onclick="startLogin()" class="btn-primary w-full py-3">Kick ile Giriş Yap</button>
@@ -40,12 +60,15 @@
   </div>
 
   <div id="mainApp" class="hidden">
-    <header class="border-b border-[#2a2f3a] sticky top-0 bg-[#0d0f14] z-50">
+    <header class="border-b border-[#2a2f3a] sticky top-0 bg-[#0b0d12]/80 backdrop-blur z-50">
       <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-4">
           <div class="flex items-center gap-2">
-            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zentrav" class="w-8 h-8 rounded-full bg-gray-800" alt="">
-            <span class="font-semibold" id="headerName">Zentrav</span>
+            <div class="logo">Z</div>
+            <div>
+              <div class="font-semibold leading-tight">Zentrav Panel</div>
+              <div class="text-[10px] text-gray-500">kick.com/zentrav</div>
+            </div>
           </div>
           <nav class="flex gap-1">
             <div class="nav-item active" data-tab="home" onclick="switchTab('home')"><i class="fa-solid fa-house"></i> Ana Sayfa</div>
@@ -64,7 +87,7 @@
     <main class="max-w-6xl mx-auto px-4 py-6">
       <div id="tab-home" class="tab active">
         <div class="flex items-start gap-4 mb-6">
-          <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zentrav" class="w-16 h-16 rounded-full bg-gray-800" alt="">
+          <div class="logo-lg">Z</div>
           <div>
             <div class="text-sm text-gray-400">kick.com/zentrav</div>
             <h1 class="text-2xl font-bold" id="homeName">Zentrav</h1>
@@ -108,7 +131,6 @@
             <h2 class="font-semibold">Yasak Kaldırma Talepleri</h2>
             <div class="flex gap-2 flex-wrap">
               <button onclick="speakSelected()" class="text-sm text-blue-400">🔊 Sesli Oku</button>
-              <button onclick="fetchBanned()" id="fetchBannedBtn" class="btn-outline text-sm">Banlıları Getir</button>
               <button onclick="showAddForm()" class="btn-primary text-sm">+ Talep Ekle</button>
             </div>
           </div>
@@ -159,34 +181,32 @@
 
       <div id="tab-raffle" class="tab">
         <h1 class="text-xl font-bold mb-1">Kick Çekiliş Aracı</h1>
-        <p class="text-sm text-gray-400 mb-4">Manuel ekle veya kutuyu aç.</p>
+        <p class="text-sm text-gray-400 mb-4">İsim ekle, kutuyu aç, kazananı seç.</p>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div class="space-y-4">
-            <div class="card p-4">
-              <div class="text-sm font-semibold mb-1">Manuel ekle</div>
-              <div class="flex gap-2">
-                <input type="text" id="manual" placeholder="Kullanıcı adı" class="flex-1 text-sm">
-                <button class="btn-outline text-sm" onclick="addManual()">+</button>
-              </div>
+          <div class="card p-4">
+            <div class="text-sm font-semibold mb-2">Katılımcı ekle</div>
+            <div class="flex gap-2 mb-3">
+              <input type="text" id="manual" placeholder="Kullanıcı adı" class="flex-1 text-sm">
+              <button class="btn-primary text-sm" onclick="addManual()">Ekle</button>
             </div>
+            <button class="text-xs text-red-400" onclick="clearParts()">Listeyi temizle</button>
           </div>
           <div class="card p-6 text-center flex flex-col items-center justify-center min-h-[280px]">
             <div class="text-xs text-gray-500 mb-3" id="entryCount">0 katılımcı</div>
             <div id="spinBox" class="spin-box mb-4">?</div>
-            <div class="font-medium mb-1" id="boxStatus">Katılımcılar bekleniyor</div>
+            <div class="font-medium mb-1" id="boxStatus">Hazır</div>
             <div class="mt-4 flex items-center gap-2 flex-wrap justify-center">
               <span class="text-sm text-gray-400">Kazanan:</span>
               <button class="w-8 h-8 rounded bg-[#1e2430] text-sm winner-btn active" data-n="1">1</button>
               <button class="w-8 h-8 rounded bg-[#0f1218] text-sm winner-btn" data-n="2">2</button>
               <button class="w-8 h-8 rounded bg-[#0f1218] text-sm winner-btn" data-n="3">3</button>
-              <button class="btn-primary text-sm" onclick="draw()">Kutuyu Aç</button>
+              <button class="btn-green text-sm" onclick="draw()">Kutuyu Aç</button>
             </div>
           </div>
           <div class="space-y-4">
             <div class="card p-4">
               <div class="flex justify-between mb-2"><div class="text-sm font-semibold">Katılımcılar</div><span class="text-xs text-gray-500" id="partCount">0</span></div>
               <div id="participants" class="text-sm max-h-40 overflow-y-auto space-y-1"><div class="text-center text-gray-500 text-xs py-6">Henüz yok</div></div>
-              <button class="text-xs text-red-400 mt-2" onclick="clearParts()">Temizle</button>
             </div>
             <div class="card p-4">
               <div class="flex justify-between mb-2"><div class="text-sm font-semibold">Kazananlar</div><span class="text-xs" id="winCount">0</span></div>
@@ -202,60 +222,37 @@
     const ADMIN = "Zentrav";
     const CLIENT_ID = "01M170XMJP255VZW7RK3JM8V5B";
     const REDIRECT_URI = "https://spirited-flow-production-b791.up.railway.app/";
-
-    let state = {
-      user: null,
-      accessToken: null,
-      isAdmin: false,
-      selected: null,
-      winnerCount: 1,
-      participants: [],
-      winners: [],
-      list: []
-    };
+    let state = { user: null, accessToken: null, isAdmin: false, selected: null, winnerCount: 1, participants: [], winners: [], list: [] };
 
     function generateRandomString(length) {
       const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-      let result = "";
-      const array = new Uint8Array(length);
-      crypto.getRandomValues(array);
+      let result = ""; const array = new Uint8Array(length); crypto.getRandomValues(array);
       for (let i = 0; i < length; i++) result += chars[array[i] % chars.length];
       return result;
     }
-
     async function sha256(plain) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(plain);
+      const data = new TextEncoder().encode(plain);
       const hash = await crypto.subtle.digest("SHA-256", data);
       return btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
     }
-
     async function startLogin() {
       const verifier = generateRandomString(64);
       const challenge = await sha256(verifier);
       sessionStorage.setItem("pkce_verifier", verifier);
       const params = new URLSearchParams({
-        response_type: "code",
-        client_id: CLIENT_ID,
-        redirect_uri: REDIRECT_URI,
+        response_type: "code", client_id: CLIENT_ID, redirect_uri: REDIRECT_URI,
         scope: "user:read channel:moderate moderation:ban",
-        code_challenge: challenge,
-        code_challenge_method: "S256",
-        state: generateRandomString(16)
+        code_challenge: challenge, code_challenge_method: "S256", state: generateRandomString(16)
       });
       location.href = "https://id.kick.com/oauth/authorize?" + params.toString();
     }
-
     async function handleCallback() {
-      const params = new URLSearchParams(location.search);
-      const code = params.get("code");
+      const code = new URLSearchParams(location.search).get("code");
       if (!code) return false;
-      const verifier = sessionStorage.getItem("pkce_verifier") || "";
       try {
         const res = await fetch("/api/token", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code, code_verifier: verifier })
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code, code_verifier: sessionStorage.getItem("pkce_verifier") || "" })
         });
         const data = await res.json();
         if (!res.ok) {
@@ -276,37 +273,24 @@
         return false;
       }
     }
-
     function loginSuccess(name) {
       state.user = name;
       state.isAdmin = name.toLowerCase() === ADMIN.toLowerCase();
       document.getElementById("loginScreen").classList.add("hidden");
       document.getElementById("mainApp").classList.remove("hidden");
       document.getElementById("userName").textContent = name;
-      document.getElementById("headerName").textContent = name;
       document.getElementById("homeName").textContent = name;
       if (state.isAdmin) document.getElementById("adminBadge").classList.remove("hidden");
       loadAppeals();
     }
-
-    function logout() {
-      localStorage.removeItem("zentrav_user");
-      localStorage.removeItem("zentrav_token");
-      location.href = "/";
-    }
-
+    function logout() { localStorage.removeItem("zentrav_user"); localStorage.removeItem("zentrav_token"); location.href = "/"; }
     (async () => {
-      if (location.search.includes("code=")) {
-        await handleCallback();
-      } else {
+      if (location.search.includes("code=")) await handleCallback();
+      else {
         const saved = localStorage.getItem("zentrav_user");
-        if (saved) {
-          state.accessToken = localStorage.getItem("zentrav_token");
-          loginSuccess(saved);
-        }
+        if (saved) { state.accessToken = localStorage.getItem("zentrav_token"); loginSuccess(saved); }
       }
     })();
-
     function switchTab(tab) {
       document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
       document.querySelector(`[data-tab="${tab}"]`).classList.add("active");
@@ -314,69 +298,23 @@
       document.getElementById("tab-" + tab).classList.add("active");
       if (tab === "appeals") loadAppeals();
     }
-
     async function loadAppeals() {
-      try {
-        const res = await fetch("/api/appeals");
-        state.list = await res.json();
-        renderList();
-      } catch (e) { console.error(e); }
+      try { const res = await fetch("/api/appeals"); state.list = await res.json(); renderList(); } catch (e) {}
     }
-
-    async function fetchBanned() {
-      const btn = document.getElementById("fetchBannedBtn");
-      btn.disabled = true;
-      btn.textContent = "Yükleniyor...";
-      try {
-        const res = await fetch("/api/banned-users");
-        const data = await res.json();
-        if (data.success && data.users && data.users.length) {
-          await loadAppeals();
-          alert(data.count + " banlı kullanıcı eklendi");
-          speak(data.count + " banlı kullanıcı yüklendi");
-        } else {
-          alert((data.message || "Ban listesi alınamadı") + "\n\nKick muhtemelen cookie/login istiyor. Manuel talep ekleyebilirsin.");
-          console.log("Denenen:", data.tried);
-        }
-      } catch (e) {
-        alert("Hata: " + e.message);
-      }
-      btn.disabled = false;
-      btn.textContent = "Banlıları Getir";
-    }
-
-    function showAddForm() {
-      document.getElementById("addForm").classList.remove("hidden");
-      document.getElementById("addError").classList.add("hidden");
-    }
+    function showAddForm() { document.getElementById("addForm").classList.remove("hidden"); document.getElementById("addError").classList.add("hidden"); }
     function hideAddForm() { document.getElementById("addForm").classList.add("hidden"); }
-
     async function addRequest() {
       const user = document.getElementById("newUser").value.trim();
       const appeal = document.getElementById("newAppeal").value.trim();
       if (!user) return alert("Kullanıcı adı gir");
       try {
-        const res = await fetch("/api/appeals", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username: user, appeal })
-        });
+        const res = await fetch("/api/appeals", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: user, appeal }) });
         const data = await res.json();
-        if (!res.ok) {
-          document.getElementById("addError").textContent = data.error || "Hata";
-          document.getElementById("addError").classList.remove("hidden");
-          return;
-        }
-        hideAddForm();
-        document.getElementById("newUser").value = "";
-        document.getElementById("newAppeal").value = "";
-        await loadAppeals();
-        speak(user + " talebi eklendi");
-      } catch (e) {
-        alert("Hata: " + e.message);
-      }
+        if (!res.ok) { document.getElementById("addError").textContent = data.error || "Hata"; document.getElementById("addError").classList.remove("hidden"); return; }
+        hideAddForm(); document.getElementById("newUser").value = ""; document.getElementById("newAppeal").value = "";
+        await loadAppeals(); speak(user + " talebi eklendi");
+      } catch (e) { alert("Hata: " + e.message); }
     }
-
     function renderList() {
       const q = (document.getElementById("search")?.value || "").toLowerCase();
       const filtered = state.list.filter(r => r.username.toLowerCase().includes(q));
@@ -387,11 +325,9 @@
           <div><div class="text-sm font-medium">${r.username}</div><div class="text-xs text-gray-500">${r.time}</div></div>
         </div>`).join("") || '<div class="p-4 text-center text-gray-500 text-sm">Talep yok</div>';
     }
-
     function select(id) {
       state.selected = id;
-      const r = state.list.find(x => x.id === id);
-      if (!r) return;
+      const r = state.list.find(x => x.id === id); if (!r) return;
       document.getElementById("empty").classList.add("hidden");
       document.getElementById("detail").classList.remove("hidden");
       document.getElementById("unbanError").classList.add("hidden");
@@ -402,142 +338,76 @@
       document.getElementById("dBanDate").textContent = r.banDate;
       document.getElementById("dBanReason").textContent = r.banReason;
       document.getElementById("dAppeal").textContent = r.appeal;
-      if (state.isAdmin) {
-        document.getElementById("adminBtns").classList.remove("hidden");
-        document.getElementById("notAdmin").classList.add("hidden");
-      } else {
-        document.getElementById("adminBtns").classList.add("hidden");
-        document.getElementById("notAdmin").classList.remove("hidden");
-      }
+      if (state.isAdmin) { document.getElementById("adminBtns").classList.remove("hidden"); document.getElementById("notAdmin").classList.add("hidden"); }
+      else { document.getElementById("adminBtns").classList.add("hidden"); document.getElementById("notAdmin").classList.remove("hidden"); }
       renderList();
     }
-
     async function unban() {
       if (!state.isAdmin) return alert("Sadece Zentrav!");
-      const r = state.list.find(x => x.id === state.selected);
-      if (!r) return;
+      const r = state.list.find(x => x.id === state.selected); if (!r) return;
       if (!confirm(r.username + " banını kaldırmak istiyor musun?")) return;
-
-      const btn = document.getElementById("unbanBtn");
-      const errEl = document.getElementById("unbanError");
-      btn.disabled = true;
-      btn.textContent = "İşleniyor...";
-      errEl.classList.add("hidden");
-
+      const btn = document.getElementById("unbanBtn"); const errEl = document.getElementById("unbanError");
+      btn.disabled = true; btn.textContent = "İşleniyor..."; errEl.classList.add("hidden");
       try {
         const res = await fetch("/api/unban", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            access_token: state.accessToken || localStorage.getItem("zentrav_token"),
-            username: r.username,
-            appeal_id: r.id
-          })
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ access_token: state.accessToken || localStorage.getItem("zentrav_token"), username: r.username, appeal_id: r.id })
         });
         const data = await res.json();
-        if (!res.ok) {
-          errEl.textContent = data.error || "Unban başarısız";
-          errEl.classList.remove("hidden");
-          btn.disabled = false;
-          btn.textContent = "Banı Kaldır";
-          return;
-        }
-        speak(r.username + " banı kaldırıldı");
-        alert("Başarılı: " + r.username + " banı kaldırıldı.");
-        state.selected = null;
-        document.getElementById("detail").classList.add("hidden");
-        document.getElementById("empty").classList.remove("hidden");
+        if (!res.ok) { errEl.textContent = data.error || "Unban başarısız"; errEl.classList.remove("hidden"); btn.disabled = false; btn.textContent = "Banı Kaldır"; return; }
+        speak(r.username + " banı kaldırıldı"); alert("Başarılı: " + r.username + " banı kaldırıldı.");
+        state.selected = null; document.getElementById("detail").classList.add("hidden"); document.getElementById("empty").classList.remove("hidden");
         await loadAppeals();
-      } catch (e) {
-        errEl.textContent = e.message;
-        errEl.classList.remove("hidden");
-      }
-      btn.disabled = false;
-      btn.textContent = "Banı Kaldır";
+      } catch (e) { errEl.textContent = e.message; errEl.classList.remove("hidden"); }
+      btn.disabled = false; btn.textContent = "Banı Kaldır";
     }
-
     async function reject() {
       if (!state.isAdmin) return alert("Sadece Zentrav!");
-      const r = state.list.find(x => x.id === state.selected);
-      if (!r) return;
+      const r = state.list.find(x => x.id === state.selected); if (!r) return;
       if (!confirm(r.username + " itirazını reddetmek istiyor musun?")) return;
-      await fetch("/api/appeals/" + r.id, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "rejected" })
-      });
+      await fetch("/api/appeals/" + r.id, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "rejected" }) });
       speak(r.username + " itirazı reddedildi");
-      state.selected = null;
-      document.getElementById("detail").classList.add("hidden");
-      document.getElementById("empty").classList.remove("hidden");
+      state.selected = null; document.getElementById("detail").classList.add("hidden"); document.getElementById("empty").classList.remove("hidden");
       await loadAppeals();
     }
-
-    function speak(text) {
-      if (!window.speechSynthesis) return;
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = "tr-TR";
-      speechSynthesis.speak(u);
-    }
-    function speakSelected() {
-      const r = state.list.find(x => x.id === state.selected);
-      if (!r) return alert("Önce talep seç");
-      speak(r.username + " itiraz etti. Sebep: " + r.appeal);
-    }
-
+    function speak(text) { if (!window.speechSynthesis) return; const u = new SpeechSynthesisUtterance(text); u.lang = "tr-TR"; speechSynthesis.speak(u); }
+    function speakSelected() { const r = state.list.find(x => x.id === state.selected); if (!r) return alert("Önce talep seç"); speak(r.username + " itiraz etti. Sebep: " + r.appeal); }
     function enableNotif() {
       if (!("Notification" in window)) return alert("Tarayıcı desteklemiyor");
-      Notification.requestPermission().then(p => {
-        alert(p === "granted" ? "Bildirimler açıldı!" : "İzin verilmedi");
-      });
+      Notification.requestPermission().then(p => alert(p === "granted" ? "Bildirimler açıldı!" : "İzin verilmedi"));
     }
-
     document.querySelectorAll(".winner-btn").forEach(btn => {
       btn.onclick = () => {
-        document.querySelectorAll(".winner-btn").forEach(b => {
-          b.classList.remove("active", "bg-[#1e2430]");
-          b.classList.add("bg-[#0f1218]");
-        });
-        btn.classList.add("active", "bg-[#1e2430]");
-        btn.classList.remove("bg-[#0f1218]");
+        document.querySelectorAll(".winner-btn").forEach(b => { b.classList.remove("active", "bg-[#1e2430]"); b.classList.add("bg-[#0f1218]"); });
+        btn.classList.add("active", "bg-[#1e2430]"); btn.classList.remove("bg-[#0f1218]");
         state.winnerCount = +btn.dataset.n;
       };
     });
-
     function addManual() {
       const name = document.getElementById("manual").value.trim();
       if (!name || state.participants.includes(name)) return;
-      state.participants.push(name);
-      document.getElementById("manual").value = "";
-      renderParts();
+      state.participants.push(name); document.getElementById("manual").value = ""; renderParts();
     }
     function renderParts() {
       document.getElementById("partCount").textContent = state.participants.length;
       document.getElementById("entryCount").textContent = state.participants.length + " katılımcı";
-      document.getElementById("participants").innerHTML = state.participants.map(p =>
-        `<div class="px-2 py-1">${p}</div>`
-      ).join("") || '<div class="text-center text-gray-500 text-xs py-6">Henüz yok</div>';
+      document.getElementById("participants").innerHTML = state.participants.map(p => `<div class="px-2 py-1">${p}</div>`).join("") || '<div class="text-center text-gray-500 text-xs py-6">Henüz yok</div>';
     }
     function clearParts() { state.participants = []; renderParts(); }
     function draw() {
       if (!state.participants.length) return alert("Katılımcı yok");
       const box = document.getElementById("spinBox");
-      box.classList.add("spinning");
-      document.getElementById("boxStatus").textContent = "Dönüyor...";
+      box.classList.add("spinning"); document.getElementById("boxStatus").textContent = "Dönüyor...";
       let count = 0;
       const interval = setInterval(() => {
         const random = state.participants[Math.floor(Math.random() * state.participants.length)];
-        box.textContent = random.substring(0, 2).toUpperCase();
-        count++;
+        box.textContent = random.substring(0, 2).toUpperCase(); count++;
         if (count > 25) {
-          clearInterval(interval);
-          box.classList.remove("spinning");
+          clearInterval(interval); box.classList.remove("spinning");
           const shuffled = [...state.participants].sort(() => Math.random() - 0.5);
           state.winners = shuffled.slice(0, state.winnerCount);
           document.getElementById("winCount").textContent = state.winners.length;
-          document.getElementById("winners").innerHTML = state.winners.map((w, i) =>
-            `<div class="px-2 py-1 font-medium">#${i + 1} ${w}</div>`
-          ).join("");
+          document.getElementById("winners").innerHTML = state.winners.map((w, i) => `<div class="px-2 py-1 font-medium">#${i + 1} ${w}</div>`).join("");
           document.getElementById("boxStatus").textContent = "Kazananlar belli!";
           box.textContent = state.winners[0].substring(0, 2).toUpperCase();
           speak("Kazananlar: " + state.winners.join(", "));
