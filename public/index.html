@@ -104,10 +104,11 @@
 
       <div id="tab-appeals" class="tab">
         <div class="card overflow-hidden">
-          <div class="flex items-center justify-between px-4 py-3 border-b border-[#2a2f3a]">
+          <div class="flex items-center justify-between px-4 py-3 border-b border-[#2a2f3a] flex-wrap gap-2">
             <h2 class="font-semibold">Yasak Kaldırma Talepleri</h2>
-            <div class="flex gap-2">
+            <div class="flex gap-2 flex-wrap">
               <button onclick="speakSelected()" class="text-sm text-blue-400">🔊 Sesli Oku</button>
+              <button onclick="fetchBanned()" id="fetchBannedBtn" class="btn-outline text-sm">Banlıları Getir</button>
               <button onclick="showAddForm()" class="btn-primary text-sm">+ Talep Ekle</button>
             </div>
           </div>
@@ -158,20 +159,10 @@
 
       <div id="tab-raffle" class="tab">
         <h1 class="text-xl font-bold mb-1">Kick Çekiliş Aracı</h1>
-        <p class="text-sm text-gray-400 mb-4">Chat katılımını takip et, kutuyu aç, kazananları seç.</p>
+        <p class="text-sm text-gray-400 mb-4">Manuel ekle veya kutuyu aç.</p>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div class="space-y-4">
             <div class="card p-4">
-              <div class="text-sm font-semibold mb-2">Kanal</div>
-              <div class="flex gap-2">
-                <input type="text" id="channel" value="zentrav" class="flex-1 text-sm">
-                <button class="btn-primary text-sm" onclick="connectChannel()">Bağlan</button>
-              </div>
-              <div class="text-xs text-gray-500 mt-2" id="chStatus">• Bağlantı bekleniyor</div>
-            </div>
-            <div class="card p-4">
-              <div class="text-sm font-semibold mb-2">Anahtar kelime</div>
-              <input type="text" id="keyword" value="çekiliş" class="w-full text-sm mb-3">
               <div class="text-sm font-semibold mb-1">Manuel ekle</div>
               <div class="flex gap-2">
                 <input type="text" id="manual" placeholder="Kullanıcı adı" class="flex-1 text-sm">
@@ -332,6 +323,28 @@
       } catch (e) { console.error(e); }
     }
 
+    async function fetchBanned() {
+      const btn = document.getElementById("fetchBannedBtn");
+      btn.disabled = true;
+      btn.textContent = "Yükleniyor...";
+      try {
+        const res = await fetch("/api/banned-users");
+        const data = await res.json();
+        if (data.success && data.users && data.users.length) {
+          await loadAppeals();
+          alert(data.count + " banlı kullanıcı eklendi");
+          speak(data.count + " banlı kullanıcı yüklendi");
+        } else {
+          alert((data.message || "Ban listesi alınamadı") + "\n\nKick muhtemelen cookie/login istiyor. Manuel talep ekleyebilirsin.");
+          console.log("Denenen:", data.tried);
+        }
+      } catch (e) {
+        alert("Hata: " + e.message);
+      }
+      btn.disabled = false;
+      btn.textContent = "Banlıları Getir";
+    }
+
     function showAddForm() {
       document.getElementById("addForm").classList.remove("hidden");
       document.getElementById("addError").classList.add("hidden");
@@ -430,7 +443,7 @@
           return;
         }
         speak(r.username + " banı kaldırıldı");
-        alert("Başarılı: " + r.username + " banı Kick'te kaldırıldı.");
+        alert("Başarılı: " + r.username + " banı kaldırıldı.");
         state.selected = null;
         document.getElementById("detail").classList.add("hidden");
         document.getElementById("empty").classList.remove("hidden");
@@ -469,7 +482,7 @@
     function speakSelected() {
       const r = state.list.find(x => x.id === state.selected);
       if (!r) return alert("Önce talep seç");
-      speak(`${r.username} itiraz etti. Sebep: ${r.appeal}`);
+      speak(r.username + " itiraz etti. Sebep: " + r.appeal);
     }
 
     function enableNotif() {
@@ -491,13 +504,6 @@
       };
     });
 
-    function connectChannel() {
-      document.getElementById("chStatus").innerHTML = '• <span class="text-green-400">Bağlandı</span>';
-      ["viewer1", "gamerx", "chatter99", "kickfan", "mod_ali"].forEach(u => {
-        if (!state.participants.includes(u)) state.participants.push(u);
-      });
-      renderParts();
-    }
     function addManual() {
       const name = document.getElementById("manual").value.trim();
       if (!name || state.participants.includes(name)) return;
